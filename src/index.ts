@@ -28,7 +28,6 @@ app.post('/api/webhook', async (c) => {
 		.filter((event) => event)[0];
 
 	if (!event) {
-		console.log(`No event: ${events}`);
 		return c.json({ message: 'ok' });
 	}
 
