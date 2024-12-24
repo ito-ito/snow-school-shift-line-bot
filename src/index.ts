@@ -14,6 +14,8 @@ app.post('/api/webhook', async (c) => {
 	// テキストメッセージの最初の1件のみを対象とする
 	const event = events
 		.map((event: WebhookEvent) => {
+			console.log({ event: event });
+
 			if (
 				event.type != 'message' ||
 				event.message.type != 'text' ||
@@ -26,7 +28,6 @@ app.post('/api/webhook', async (c) => {
 		.filter((event) => event)[0];
 
 	if (!event) {
-		console.log(`No event: ${events}`);
 		return c.json({ message: 'ok' });
 	}
 
