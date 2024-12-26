@@ -8,8 +8,13 @@ export const scheduled: ExportedHandlerScheduledHandler = async (event, env, ctx
 const sendDailySchedule = async (env: any) => {
 	const accessToken = env.LINE_CHANNEL_ACCESS_TOKEN;
 	const to = env.LINE_PUSH_MESSAGE_TO;
-	const date = new Date();
+	const todayUTC = new Date();
 	const jstOffset = 9 * 60 * 60 * 1000; // UTCとの差分9時間をミリ秒に変換
+	const todayJST = new Date(todayUTC.getTime() + jstOffset);
+	todayJST.setHours(0, 0, 0, 0);
+
+	const tommorowJST = new Date(todayJST);
+	tommorowJST.setDate(todayJST.getDate() + 1);
 
 	const response = await fetch(`${env.API_ENDPOINT_URL}?page=shift`).catch((err) => {
 		console.error(err);
@@ -17,11 +22,11 @@ const sendDailySchedule = async (env: any) => {
 	if (!response) return;
 
 	const data = await response.json();
-	const todayShift = data.find(
-		(shiftSchedule) => new Date(new Date(shiftSchedule.date).getTime() + jstOffset).toDateString() === date.toDateString(),
+	const tommorowShift = data.find(
+		(shiftSchedule) => new Date(new Date(shiftSchedule.date).getTime() + jstOffset).toDateString() === tommorowJST.toDateString(),
 	);
 
-	const shiftMessage = shiftMessageContainer(todayShift);
+	const shiftMessage = shiftMessageContainer({ ...tommorowShift, url: env.SHIFT_PAGE_URL });
 	if (!shiftMessage) return;
 
 	const lineClient = new Line(accessToken);
