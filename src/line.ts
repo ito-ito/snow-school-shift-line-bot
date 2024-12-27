@@ -11,28 +11,28 @@ export class Line {
 		};
 	}
 
-	public async replyMessage(messages: Array<TextMessage>, replyToken: string): Promise<Response | null> {
-		return await fetch(`${this.baseUrl}/message/reply`, {
+	public async replyMessage(messages: Array<TextMessage>, replyToken: string): Promise<void> {
+		const response = await fetch(`${this.baseUrl}/message/reply`, {
 			method: 'POST',
 			headers: this.headers,
 			body: JSON.stringify({
 				replyToken: replyToken,
 				messages: messages,
 			}),
-		}).catch((err) => {
-			console.error(`[LINE] replyMessage error: ${err}`);
-			return null;
 		});
+		if (!response.ok) {
+			throw new Error(await response.text());
+		}
 	}
 
-	public async pushMessage(messages: Array<TextMessage | FlexMessage>, to: string): Promise<Response | null> {
-		return await fetch(`${this.baseUrl}/message/push`, {
+	public async pushMessage(messages: Array<TextMessage | FlexMessage>, to: string): Promise<void> {
+		const response = await fetch(`${this.baseUrl}/message/push`, {
 			method: 'POST',
 			headers: this.headers,
 			body: JSON.stringify({ to: to, messages: messages }),
-		}).catch((err) => {
-			console.log(`[LINE] pushMessage error: ${err}`);
-			return null;
 		});
+		if (!response.ok) {
+			throw new Error(await response.text());
+		}
 	}
 }
