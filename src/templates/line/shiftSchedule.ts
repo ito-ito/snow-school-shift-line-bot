@@ -9,9 +9,10 @@ type PresenterProps = {
 			memberNames: Array<string>;
 		}[];
 	}[];
+	url: string;
 };
 
-const shiftMessagePresenter = ({ date, details }: PresenterProps): FlexMessage => {
+const shiftMessagePresenter = ({ date, details, url }: PresenterProps): FlexMessage => {
 	const shiftContents: FlexComponent[] = details.flatMap((detail) => {
 		return [
 			{
@@ -51,7 +52,7 @@ const shiftMessagePresenter = ({ date, details }: PresenterProps): FlexMessage =
 
 	return {
 		type: 'flex',
-		altText: '勤務予定',
+		altText: '明日の勤務予定をお知らせします',
 		contents: {
 			type: 'bubble',
 			body: {
@@ -74,7 +75,7 @@ const shiftMessagePresenter = ({ date, details }: PresenterProps): FlexMessage =
 					},
 					{
 						type: 'text',
-						text: '勤務情報をお伝えします',
+						text: '明日の勤務予定をお伝えします',
 						size: 'xs',
 						color: '#aaaaaa',
 						wrap: true,
@@ -86,12 +87,29 @@ const shiftMessagePresenter = ({ date, details }: PresenterProps): FlexMessage =
 						spacing: 'sm',
 						contents: shiftContents,
 					},
+				],
+			},
+			footer: {
+				type: 'box',
+				layout: 'vertical',
+				spacing: 'sm',
+				contents: [
 					{
 						type: 'text',
-						text: '最新の勤務情報は勤務表からご確認ください',
+						text: '最新の情報は勤務予定表からご確認ください',
 						color: '#aaaaaa',
 						size: 'xs',
 						margin: 'xl',
+					},
+					{
+						type: 'button',
+						style: 'primary',
+						height: 'sm',
+						action: {
+							type: 'uri',
+							label: '勤務予定表を確認する',
+							uri: url,
+						},
 					},
 				],
 			},
@@ -120,9 +138,10 @@ type ContainerProps = {
 			}[];
 		}[];
 	}[];
+	url: string;
 };
 
-const shiftMessageContainer = ({ date, details }: ContainerProps): FlexMessage | undefined => {
+const shiftMessageContainer = ({ date, details, url }: ContainerProps): FlexMessage | undefined => {
 	const jstOffset = 9 * 60 * 60 * 1000; // UTCとの差分9時間をミリ秒に変換
 
 	if (!details.length) return;
@@ -140,6 +159,7 @@ const shiftMessageContainer = ({ date, details }: ContainerProps): FlexMessage |
 				}),
 			};
 		}),
+		url: url,
 	});
 };
 
